@@ -1,0 +1,76 @@
+    :root {
+      --bg1: #0f1020;
+      --bg2: #1a1c3a;
+      --card: #ffffff;
+      --accent: #66e3ff;
+      --accent2: #ff9fd6;
+      --text: #0e1222;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; margin: 0; padding: 0; }
+    body {
+      background: radial-gradient(1000px 600px at 20% 10%, rgba(102,227,255,0.07), transparent 60%),
+                  radial-gradient(800px 500px at 80% 80%, rgba(255,159,214,0.08), transparent 60%),
+                  linear-gradient(180deg, var(--bg1), var(--bg2));
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, 'Noto Sans', 'Helvetica Neue', Arial, sans-serif;
+      color: #f5f7fb;
+      overflow: hidden; /* wall takes full screen */
+    }
+    .toolbar {
+      position: fixed; top: 14px; left: 50%; transform: translateX(-50%);
+      display: flex; gap: 10px; z-index: 10;
+      background: rgba(19,22,45,0.65); border: 1px solid rgba(255,255,255,0.07);
+      padding: 8px 12px; border-radius: 999px; backdrop-filter: blur(8px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+    }
+    .btn {
+      appearance: none; border: 0; cursor: pointer; padding: 10px 16px; border-radius: 999px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      color: #06101a; font-weight: 700; letter-spacing: 0.2px; box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+    }
+    .btn.secondary { background: rgba(255,255,255,0.1); color: #eaf6ff; font-weight: 600; }
+    .wall {
+      position: absolute; inset: 0; overflow: hidden;
+    }
+    .wish {
+      position: absolute; min-width: 200px; max-width: 380px;
+      background: var(--card); color: var(--text);
+      border-radius: 14px; padding: 12px 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+      border: 1px solid rgba(0,0,0,0.08);
+      will-change: transform;
+      user-select: none;
+    }
+    .wish .text { font-size: 16px; line-height: 1.35; }
+    .wish .name { margin-top: 8px; font-size: 13px; font-weight: 700; color: #4e5b6f; text-align: right; }
+    .badge-new {
+      position: absolute; top: -8px; left: -8px; font-size: 11px; font-weight: 800;
+      background: #ffe766; color: #3a2d00; padding: 4px 8px; border-radius: 999px;
+      border: 1px solid rgba(0,0,0,0.08);
+    }
+    /* Modal */
+    .modal-backdrop {
+      position: fixed; inset: 0; background: rgba(10, 12, 24, 0.55);
+      display: none; align-items: center; justify-content: center; z-index: 20;
+      backdrop-filter: blur(4px);
+    }
+    .modal-backdrop.show { display: flex; }
+    .modal {
+      width: min(560px, 92vw);
+      background: #0e1324; color: #e8f3ff; border-radius: 14px; padding: 18px;
+      border: 1px solid rgba(255,255,255,0.08);
+      box-shadow: 0 18px 60px rgba(0,0,0,0.5);
+    }
+    .modal h2 { margin: 0 0 12px; }
+    .row { display: flex; flex-direction: column; gap: 8px; margin: 10px 0; }
+    label { font-size: 13px; color: #b8c7db; }
+    input[type=text], textarea {
+      width: 100%; padding: 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.15);
+      background: #0b0f1e; color: #eaf6ff; resize: vertical;
+    }
+    .hint { font-size: 12px; color: #92a6bf; }
+    .form-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 8px; }
+    .switch { display: inline-flex; align-items: center; gap: 8px; }
+    .credits { position: fixed; bottom: 8px; right: 12px; font-size: 11px; color: #91a2b8; opacity: 0.65; }
+    @media (max-width: 640px) {
+      .wish { min-width: 160px; max-width: 300px; }
+    }
