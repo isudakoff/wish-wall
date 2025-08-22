@@ -7,6 +7,70 @@
 
   let lastId = 0;
   const wishesMap = new Map(); // id -> element
+  let paused = false;
+  let focusedEl = null;
+
+  function pauseAll() {
+    paused = true;
+    for (const el of wishesMap.values()) {
+      const st = el._state;
+      if (st && st.raf) {
+        cancelAnimationFrame(st.raf);
+        st.raf = null;
+      }
+    }
+  }
+
+  function resumeAll() {
+    paused = false;
+    for (const el of wishesMap.values()) {
+      const st = el._state;
+      if (!st) continue;
+      st.lastTs = performance.now();
+      if (!st.raf) st.raf = requestAnimationFrame(st.tick);
+    }
+  }
+
+  function focusWish(el) {
+    if (focusedEl) return;
+    pauseAll();
+    focusedEl = el;
+    el.classList.add('focused');
+    for (const other of wishesMap.values()) {
+      if (other !== el) other.classList.add('dimmed');
+    }
+    const st = el._state;
+    const wallRect = wall.getBoundingClientRect();
+    const rect = el.getBoundingClientRect();
+    st.x = (wallRect.width - rect.width) / 2;
+    st.y = (wallRect.height - rect.height) / 2;
+    el.style.transition = 'transform 0.6s';
+    el.style.transform = `translate(${st.x}px, ${st.y}px)`;
+    el.style.zIndex = '50';
+    const btn = document.createElement('button');
+    btn.className = 'close-btn';
+    btn.innerHTML = '&times;';
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      unfocusWish();
+    });
+    el.appendChild(btn);
+  }
+
+  function unfocusWish() {
+    if (!focusedEl) return;
+    const el = focusedEl;
+    el.classList.remove('focused');
+    el.style.transition = '';
+    el.style.zIndex = '';
+    const btn = el.querySelector('.close-btn');
+    if (btn) btn.remove();
+    for (const other of wishesMap.values()) {
+      other.classList.remove('dimmed');
+    }
+    focusedEl = null;
+    resumeAll();
+  }
 
   function openModal() {
     modalBackdrop.classList.add('show');
@@ -52,54 +116,58 @@
     el.querySelector('.name span').textContent = w.name;
 
     wall.appendChild(el);
+    if (focusedEl) el.classList.add('dimmed');
 
     // Random initial position
     const wallRect = wall.getBoundingClientRect();
     const elRect = el.getBoundingClientRect();
-    let x = Math.random() * Math.max(10, wallRect.width - elRect.width - 10);
-    let y = Math.random() * Math.max(10, wallRect.height - elRect.height - 10);
-
-    // Random velocity (px/sec)
-    let speed = 30 + Math.random() * 45; // 30..75 px/s
-    // Random direction
-    let angle = Math.random() * Math.PI * 2;
-    let vx = Math.cos(angle) * speed;
-    let vy = Math.sin(angle) * speed;
-
-    // Keep within bounds and bounce
-    let lastTs = performance.now();
+    const state = {
+      x: Math.random() * Math.max(10, wallRect.width - elRect.width - 10),
+      y: Math.random() * Math.max(10, wallRect.height - elRect.height - 10),
+      speed: 30 + Math.random() * 45,
+    };
+    const angle = Math.random() * Math.PI * 2;
+    state.vx = Math.cos(angle) * state.speed;
+    state.vy = Math.sin(angle) * state.speed;
+    state.lastTs = performance.now();
     function tick(ts) {
-      const dt = (ts - lastTs) / 1000; // sec
-      lastTs = ts;
+      const dt = (ts - state.lastTs) / 1000; // sec
+      state.lastTs = ts;
 
-      x += vx * dt;
-      y += vy * dt;
+      state.x += state.vx * dt;
+      state.y += state.vy * dt;
 
       const rect = el.getBoundingClientRect();
-      // Bounds (using current element size to avoid clipping)
       const maxX = wall.clientWidth - rect.width;
       const maxY = wall.clientHeight - rect.height;
 
-      if (x < 0) { x = 0; vx = Math.abs(vx); }
-      else if (x > maxX) { x = maxX; vx = -Math.abs(vx); }
+      if (state.x < 0) { state.x = 0; state.vx = Math.abs(state.vx); }
+      else if (state.x > maxX) { state.x = maxX; state.vx = -Math.abs(state.vx); }
 
-      if (y < 0) { y = 0; vy = Math.abs(vy); }
-      else if (y > maxY) { y = maxY; vy = -Math.abs(vy); }
+      if (state.y < 0) { state.y = 0; state.vy = Math.abs(state.vy); }
+      else if (state.y > maxY) { state.y = maxY; state.vy = -Math.abs(state.vy); }
 
-      el.style.transform = `translate(${x}px, ${y}px)`;
-      el._raf = requestAnimationFrame(tick);
+      el.style.transform = `translate(${state.x}px, ${state.y}px)`;
+      if (!paused) state.raf = requestAnimationFrame(tick);
     }
-    el._raf = requestAnimationFrame(tick);
+    state.tick = tick;
+    el._state = state;
+    if (!paused) state.raf = requestAnimationFrame(tick);
 
-    // Handle resize
     const onResize = () => {
       const rect = el.getBoundingClientRect();
       const maxX = wall.clientWidth - rect.width;
       const maxY = wall.clientHeight - rect.height;
-      if (x > maxX) x = Math.max(0, maxX);
-      if (y > maxY) y = Math.max(0, maxY);
+      if (state.x > maxX) state.x = Math.max(0, maxX);
+      if (state.y > maxY) state.y = Math.max(0, maxY);
+      el.style.transform = `translate(${state.x}px, ${state.y}px)`;
     };
     window.addEventListener('resize', onResize);
+
+    el.addEventListener('click', () => {
+      if (focusedEl === el) return;
+      focusWish(el);
+    });
 
     wishesMap.set(w.id, el);
     if (w.id > lastId) lastId = w.id;
