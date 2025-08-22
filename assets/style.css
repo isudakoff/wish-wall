@@ -18,30 +18,37 @@
     }
     .toolbar {
       position: fixed; top: 14px; left: 50%; transform: translateX(-50%);
-      display: flex; gap: 10px; z-index: 10;
+      display: flex; gap: 12px; z-index: 10;
       background: rgba(19,22,45,0.65); border: 1px solid rgba(255,255,255,0.07);
-      padding: 8px 12px; border-radius: 999px; backdrop-filter: blur(8px);
+      padding: 10px 16px; border-radius: 999px; backdrop-filter: blur(8px);
       box-shadow: 0 10px 30px rgba(0,0,0,0.25);
     }
     .btn {
-      appearance: none; border: 0; cursor: pointer; padding: 10px 16px; border-radius: 999px;
+      appearance: none; border: 0; cursor: pointer; padding: 14px 22px; border-radius: 999px;
       background: linear-gradient(90deg, var(--accent), var(--accent2));
       color: #06101a; font-weight: 700; letter-spacing: 0.2px; box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+      font-size: 18px; line-height: 1;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+    .btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.35);
     }
     .btn.secondary { background: rgba(255,255,255,0.1); color: #eaf6ff; font-weight: 600; }
     .wall {
       position: absolute; inset: 0; overflow: hidden;
     }
     .wish {
-      position: absolute; min-width: 200px; max-width: 380px;
+      position: absolute; min-width: 220px; max-width: 420px;
       background: var(--card); color: var(--text);
-      border-radius: 14px; padding: 12px 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+      border-radius: 16px; padding: 16px 18px; box-shadow: 0 14px 40px rgba(0,0,0,0.25);
       border: 1px solid rgba(0,0,0,0.08);
       will-change: transform;
       user-select: none;
+      overflow: visible;
     }
-    .wish .text { font-size: 16px; line-height: 1.35; }
-    .wish .name { margin-top: 8px; font-size: 13px; font-weight: 700; color: #4e5b6f; text-align: right; }
+    .wish .text { font-size: 20px; line-height: 1.4; }
+    .wish .name { margin-top: 10px; font-size: 16px; font-weight: 700; color: #4e5b6f; text-align: right; }
     .badge-new {
       position: absolute; top: -8px; left: -8px; font-size: 11px; font-weight: 800;
       background: #ffe766; color: #3a2d00; padding: 4px 8px; border-radius: 999px;
@@ -62,27 +69,52 @@
     }
     .modal h2 { margin: 0 0 12px; }
     .row { display: flex; flex-direction: column; gap: 8px; margin: 10px 0; }
-    label { font-size: 13px; color: #b8c7db; }
+    label { font-size: 16px; color: #b8c7db; }
     input[type=text], textarea {
-      width: 100%; padding: 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.15);
-      background: #0b0f1e; color: #eaf6ff; resize: vertical;
+      width: 100%; padding: 14px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.15);
+      background: #0b0f1e; color: #eaf6ff; resize: vertical; font-size: 16px;
     }
-    .hint { font-size: 12px; color: #92a6bf; }
+    .hint { font-size: 14px; color: #92a6bf; }
     .form-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 8px; }
     .switch { display: inline-flex; align-items: center; gap: 8px; }
-    .credits { position: fixed; bottom: 8px; right: 12px; font-size: 11px; color: #91a2b8; opacity: 0.65; }
+    .credits { position: fixed; bottom: 8px; right: 12px; font-size: 13px; color: #91a2b8; opacity: 0.65; }
     @media (max-width: 640px) {
       .wish { min-width: 160px; max-width: 300px; }
     }
 
     .wish.dimmed { opacity: 0.15; pointer-events: none; }
     .wish.focused { animation: glow 2s ease-in-out infinite; }
+    .wish.focused::before {
+      content: "";
+      position: absolute;
+      top: -60%; left: -60%;
+      width: 220%; height: 220%;
+      background: radial-gradient(circle at 50% -20%, rgba(255,255,210,0.7), rgba(255,255,210,0.05) 60%, transparent 70%);
+      z-index: -1; pointer-events: none;
+      animation: spotlight 6s ease-in-out infinite;
+    }
+    @keyframes spotlight {
+      0% { transform: rotate(-20deg); }
+      50% { transform: rotate(20deg); }
+      100% { transform: rotate(-20deg); }
+    }
     .wish .close-btn {
       position: absolute; top: 6px; right: 6px; width: 24px; height: 24px;
       border: none; border-radius: 50%; cursor: pointer;
       background: rgba(0,0,0,0.4); color: #fff; line-height: 24px; font-size: 16px;
     }
     .wish .close-btn:hover { background: rgba(0,0,0,0.6); }
+    .wish .firework {
+      position: absolute; width: 8px; height: 8px; border-radius: 50%;
+      background: radial-gradient(circle, var(--accent), transparent 70%);
+      pointer-events: none;
+      animation: firework 800ms ease-out forwards;
+      box-shadow: 0 0 6px var(--accent), 0 0 12px var(--accent2);
+    }
+    @keyframes firework {
+      0% { transform: scale(0.2); opacity: 1; }
+      100% { transform: scale(3); opacity: 0; }
+    }
     @keyframes glow {
       0% { box-shadow: 0 0 0 0 rgba(102,227,255,0.7); }
       70% { box-shadow: 0 0 0 20px rgba(102,227,255,0); }
