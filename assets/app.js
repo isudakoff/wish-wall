@@ -31,6 +31,18 @@
     }
   }
 
+  function spawnFirework(el) {
+    const fw = document.createElement('div');
+    fw.className = 'firework';
+    const rect = el.getBoundingClientRect();
+    const angle = Math.random() * Math.PI * 2;
+    const dist = Math.max(rect.width, rect.height) / 2 + 20;
+    fw.style.left = `${rect.width / 2 + Math.cos(angle) * dist}px`;
+    fw.style.top = `${rect.height / 2 + Math.sin(angle) * dist}px`;
+    el.appendChild(fw);
+    setTimeout(() => fw.remove(), 800);
+  }
+
   function focusWish(el) {
     if (focusedEl) return;
     pauseAll();
@@ -55,16 +67,25 @@
       unfocusWish();
     });
     el.appendChild(btn);
+
+    // Start subtle fireworks around focused card
+    st.fireInterval = setInterval(() => spawnFirework(el), 800);
   }
 
   function unfocusWish() {
     if (!focusedEl) return;
     const el = focusedEl;
+    const st = el._state;
     el.classList.remove('focused');
     el.style.transition = '';
     el.style.zIndex = '';
     const btn = el.querySelector('.close-btn');
     if (btn) btn.remove();
+    if (st && st.fireInterval) {
+      clearInterval(st.fireInterval);
+      st.fireInterval = null;
+    }
+    el.querySelectorAll('.firework').forEach(fw => fw.remove());
     for (const other of wishesMap.values()) {
       other.classList.remove('dimmed');
     }
