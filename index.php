@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use WishWall\Router;
-use WishWall\Handler\{WishHandler, WishesHandler, ExportHandler, SeedHandler};
+use WishWall\Handler\{WishHandler, WishesHandler, ExportHandler, SeedHandler, ClearHandler};
 use WishWall\View\WallView;
 
 if (PHP_SAPI === 'cli-server') {
@@ -21,6 +21,7 @@ $router->add('POST', '/api/wish', [WishHandler::class, 'handle']);
 $router->add('GET', '/api/wishes', [WishesHandler::class, 'handle']);
 $router->add('GET', '/export.csv', [ExportHandler::class, 'handle']);
 $router->add('GET', '/seed', [SeedHandler::class, 'handle']);
+$router->add('POST', '/api/clear', [ClearHandler::class, 'handle']);
 $router->add('GET', '/', [WallView::class, 'render']);
 
 $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';

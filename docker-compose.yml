@@ -5,13 +5,18 @@ services:
     image: php:8.3-fpm
     container_name: wish-wall-php
     volumes:
-      - ./index.php:/var/www/html/index.php
-      - ./data:/var/www/html/data
+      - .:/var/www/html
     working_dir: /var/www/html
     environment:
       - PHP_FPM_USER=www-data
       - PHP_FPM_GROUP=www-data
     restart: unless-stopped
+    command: >
+      sh -c "
+        curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer &&
+        composer install &&
+        php-fpm
+      "
 
   nginx:
     image: nginx:alpine
