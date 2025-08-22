@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  php:
+    image: php:8.3-fpm
+    container_name: wish-wall-php
+    volumes:
+      - ./index.php:/var/www/html/index.php
+      - ./data:/var/www/html/data
+    working_dir: /var/www/html
+    environment:
+      - PHP_FPM_USER=www-data
+      - PHP_FPM_GROUP=www-data
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:alpine
+    container_name: wish-wall-nginx
+    ports:
+      - "8080:80"
+    volumes:
+      - ./index.php:/var/www/html/index.php
+      - ./data:/var/www/html/data
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - php
+    restart: unless-stopped
